@@ -45,6 +45,10 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.5.0'
 
+    // AWS S3
+    implementation platform('software.amazon.awssdk:bom:2.20.120')
+    implementation 'software.amazon.awssdk:s3'
+
 
 }
 

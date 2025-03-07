@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 //로그 파일(.log) 로 저장하여 운영 환경에서도 확인 가능 등 여러가지 사유로 print 대신 log 로 출력 찍어본다.
 public class BoardService {
     private final BoardRepository boardRepository;
+    private final S3Service s3Service;
 
     //들어온 boardId 값과 db의 boardId 값이 일치하는 row 가져오기
     public Optional<Board> getBoard(Long boardId) {
@@ -56,5 +58,23 @@ public class BoardService {
     //이부분 더 설명 필요할듯
     public void deleteBoard(Long boardId){
         boardRepository.deleteByBoardId(boardId);
+    }
+
+
+    @Transactional
+    //이미지 포함 게시글 생성
+    public void ImageBoard(BoardDTO request) throws IOException {
+
+        String savedImageURI = s3Service.upload(request.getImage()); //이미지 s3에 업로드하고 url 가져오기
+
+        Board board = Board.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .writer(request.getWriter())
+                .image(savedImageURI) //img url 넣기
+                .build();
+
+        boardRepository.save(board);
+
     }
 }
